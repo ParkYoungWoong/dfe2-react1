@@ -1,4 +1,8 @@
+.nav {
+  display: flex;
+  gap: 10px;
+}
+
 .active {
-  color: orange;
-  font-weight: bold;
+  color: tomato;
 }

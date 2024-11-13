@@ -8,7 +8,3 @@ createRoot(document.getElementById('root')!).render(
     <Router />
   </StrictMode>
 )
-
-// route - 개별 페이지 정보
-// routes - 페이지 정보
-// router - 페이지 제어

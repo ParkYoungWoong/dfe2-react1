@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import Modal from '@/components/Modal'
 
 export interface Movie {
   Title: string
@@ -48,11 +49,19 @@ export default function MovieDetails() {
     setMovie(movie)
   }
   return (
-    <>
+    <Modal>
       <h1>Movie Details</h1>
-      <h2>{movie?.Title}</h2>
-      <p>{movie?.Plot}</p>
-    </>
+      {movie && (
+        <>
+          <h2>{movie.Title}</h2>
+          <img
+            src={movie.Poster}
+            alt={movie.Plot}
+          />
+          <p>{movie.Plot}</p>
+        </>
+      )}
+    </Modal>
   )
 }
 
