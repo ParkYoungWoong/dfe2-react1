@@ -1,11 +1,13 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import Home from './pages/Home.tsx'
-import About from './pages/About.tsx'
-import Movies from './pages/Movies.tsx'
-import MovieDetails from './pages/MovieDetails.tsx'
-import SignIn from './pages/SignIn.tsx'
-import DefaultLayout from './layouts/Default.tsx'
-import NotFound from './pages/NotFound.tsx'
+import Home from './pages/Home'
+import About from './pages/About'
+import Movies from './pages/Movies'
+import MovieDetails from './pages/MovieDetails'
+import SignIn from './pages/SignIn'
+import DefaultLayout from './layouts/Default'
+import NotFound from './pages/NotFound'
+import Dashboard from './pages/Dashboard'
+import { requiresAuth } from './loaders/requiresAuth'
 
 const router = createBrowserRouter([
   {
@@ -32,6 +34,11 @@ const router = createBrowserRouter([
       {
         path: '/signin',
         element: <SignIn />
+      },
+      {
+        path: '/dashboard',
+        element: <Dashboard />,
+        loader: requiresAuth
       }
     ]
   },

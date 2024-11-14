@@ -1,12 +1,23 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 export default function SignInPage() {
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const [id, setId] = useState('')
+  const [password, setPassword] = useState('')
+
+  const callbackUrl = searchParams.get('callbackUrl')
 
   function signIn() {
-    console.log(id, password);
-    // 로그인 정보 전송
+    console.log(id, password)
+    if (id && password) {
+      // 로그인 성공!
+      const accessToken = 'abcxyz123'
+      localStorage.setItem('accessToken', accessToken)
+      // 메인 페이지로 이동!
+      navigate(callbackUrl || '/')
+    }
   }
 
   return (
@@ -17,7 +28,7 @@ export default function SignInPage() {
         placeholder="아이디"
         value={id}
         onChange={e => {
-          setId(e.target.value);
+          setId(e.target.value)
         }}
       />
       <input
@@ -25,10 +36,10 @@ export default function SignInPage() {
         placeholder="비밀번호"
         value={password}
         onChange={e => {
-          setPassword(e.target.value);
+          setPassword(e.target.value)
         }}
       />
       <button onClick={signIn}>로그인</button>
     </>
-  );
+  )
 }

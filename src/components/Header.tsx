@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
-import styles from './Header.module.css';
+import { NavLink } from 'react-router-dom'
+import styles from './Header.module.css'
 
 const navigations = [
   {
@@ -15,6 +15,10 @@ const navigations = [
     label: 'Sign In'
   },
   {
+    to: '/dashboard',
+    label: 'Dashboard'
+  },
+  {
     to: '/movies',
     label: 'Movies'
   },
@@ -22,7 +26,7 @@ const navigations = [
     to: '/movies/tt4154796',
     label: 'Endgame'
   }
-];
+]
 
 export default function Header() {
   return (
@@ -39,5 +43,5 @@ export default function Header() {
         ))}
       </nav>
     </header>
-  );
+  )
 }
