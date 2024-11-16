@@ -1,14 +1,8 @@
-import { useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { useMovieStore } from '@/stores/movie'
+import { useQuery } from '@tanstack/react-query'
 
-export interface IMovies {
-  Search: IMovie[]
-  totalResults: string
-  Response: string
-}
-
-export interface IMovie {
+export interface Movie {
   Title: string
   Year: string
   imdbID: string
@@ -17,11 +11,23 @@ export interface IMovie {
 }
 
 export default function Movies() {
-  // const [searchText, setSearchText] = useState('')
-  // const [movies, setMovies] = useState<IMovie[]>([])
   const searchText = useMovieStore(state => state.searchText)
-  const movies = useMovieStore(state => state.movies)
-  const searchMovies = useMovieStore(state => state.searchMovies)
+  // const movies = useMovieStore(state => state.movies)
+  // const searchMovies = useMovieStore(state => state.searchMovies)
+  const setSearchText = useMovieStore(state => state.setSearchText)
+
+  const { data: movies, refetch } = useQuery<Movie[]>({
+    queryKey: ['movies', searchText],
+    queryFn: async () => {
+      const res = await fetch(
+        `https://omdbapi.com?apikey=7035c60c&s=${searchText}`
+      )
+      const { Search } = await res.json()
+      return Search
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+    enabled: false
+  })
 
   return (
     <>
@@ -30,11 +36,11 @@ export default function Movies() {
         type="text"
         value={searchText}
         onChange={e => setSearchText(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && searchMovies()}
+        onKeyDown={e => e.key === 'Enter' && refetch()}
       />
-      <button onClick={() => searchMovies()}>검색</button>
+      <button onClick={() => refetch()}>검색</button>
       <ul>
-        {movies.map(movie => (
+        {movies?.map(movie => (
           <li key={`/movies/${movie.imdbID}`}>
             <Link to={movie.imdbID}>{movie.Title}</Link>
           </li>
