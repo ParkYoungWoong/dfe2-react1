@@ -1,16 +1,17 @@
-interface A {
-  x: number
-  hello: () => Promise<number>
+function add<xType, yType>(x: xType, y: yType, z: xType) {
+  // @ts-ignore
+  return x + y
 }
 
-async function hello() {
-  return 123
+interface Movie {
+  title: string
+  poster: string
 }
 
-const a = {
-  x: 123,
-  hello
-}
-
-// hello() // undefined
-hello() // promise
+add(1, '2', 3)
+// add<Movie>({ title: 'Joker', poster: '' }, 2) // 3
+// add('1', '2') // '12'
+// add(false, true)
+// add<string>(1, '2')
+// add<boolean>(true, false)
+// add<undefined>(undefined, undefined)
