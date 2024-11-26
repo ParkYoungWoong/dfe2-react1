@@ -1,6 +1,7 @@
 import { Link, Outlet } from 'react-router-dom'
 import { useMovieStore } from '@/stores/movie'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import Loader from '@/components/Loader'
 
 export interface Movie {
   Title: string
@@ -17,17 +18,29 @@ export default function Movies() {
   const setSearchText = useMovieStore(state => state.setSearchText)
 
   const queryClient = useQueryClient()
-  const { data: movies } = useQuery<Movie[]>({
+  const {
+    data: movies,
+    isFetching,
+    isLoading
+  } = useQuery<Movie[]>({
     queryKey: ['movies', searchText],
     queryFn: async () => {
       const res = await fetch(
         `https://omdbapi.com?apikey=7035c60c&s=${searchText}`
       )
       const { Search } = await res.json()
+      if (!Search) {
+        throw new Error('영화를 찾을 수 없습니다!')
+      }
       return Search
     },
-    staleTime: 1000 * 60 * 5,
-    enabled: !!searchText
+    staleTime: 1000 * 10,
+    // placeholderData: prev => prev,
+    // placeholderData: [{ Title: '임시데이터', Year: '9999' } as Movie],
+    enabled: !!searchText,
+    select: data => {
+      return data?.filter(movie => Number.parseInt(movie.Year, 10) > 2000)
+    }
   })
 
   function fetchMovies() {
@@ -37,7 +50,7 @@ export default function Movies() {
     queueMicrotask(() => {
       queryClient.fetchQuery({
         queryKey: ['movies', searchText],
-        staleTime: 1000 * 60 * 60 * 24
+        staleTime: 1000 * 10
       })
     })
   }
@@ -46,16 +59,20 @@ export default function Movies() {
     <>
       <h1>Movies</h1>
       <input
+        placeholder="검색할 영화 제목을 작성하세요!"
         type="text"
         value={inputText}
         onChange={e => setInputText(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && fetchMovies()}
       />
       <button onClick={() => fetchMovies()}>검색</button>
+      {isFetching && <Loader />}
       <ul>
         {movies?.map(movie => (
           <li key={`/movies/${movie.imdbID}`}>
-            <Link to={movie.imdbID}>{movie.Title}</Link>
+            <Link to={movie.imdbID}>
+              {movie.Title}({movie.Year})
+            </Link>
           </li>
         ))}
       </ul>
