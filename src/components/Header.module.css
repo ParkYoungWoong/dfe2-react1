@@ -1,8 +1,12 @@
 .nav {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
-
+.flex-item {
+  /* 감소 너비 비율 */
+  flex-shrink: 0;
+}
 .active {
   color: tomato;
 }

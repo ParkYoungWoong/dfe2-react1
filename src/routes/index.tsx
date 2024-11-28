@@ -7,6 +7,7 @@ import SignIn from './pages/SignIn'
 import DefaultLayout from './layouts/Default'
 import NotFound from './pages/NotFound'
 import Dashboard from './pages/Dashboard'
+import Todos from './pages/Todos'
 import { requiresAuth } from './loaders/requiresAuth'
 
 const router = createBrowserRouter([
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
         path: '/dashboard',
         element: <Dashboard />,
         loader: requiresAuth
+      },
+      {
+        path: '/todos',
+        element: <Todos />
       }
     ]
   },

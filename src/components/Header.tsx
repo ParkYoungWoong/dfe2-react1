@@ -25,6 +25,10 @@ const navigations = [
   {
     to: '/movies/tt4154796',
     label: 'Endgame'
+  },
+  {
+    to: '/todos',
+    label: 'Todos'
   }
 ]
 
