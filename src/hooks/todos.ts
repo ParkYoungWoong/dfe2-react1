@@ -26,24 +26,17 @@ export const useTodoFiltersStore = create<{
   }
 })
 
-const headers = {
-  'Content-Type': 'application/json',
-  apikey: 'KDT8_bcAWVpD8',
-  username: 'KDT8_ParkYoungWoong'
-}
-
 export function useFetchTodos() {
   const filterStatus = useTodoFiltersStore(state => state.filterStatus)
   return useQuery<Todos>({
     queryKey: ['todos'],
     queryFn: async () => {
-      const res = await fetch(
-        'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
-        {
-          // method: 'GET',
-          headers
-        }
-      )
+      const res = await fetch('/api/todos', {
+        method: 'POST',
+        body: JSON.stringify({
+          method: 'GET'
+        })
+      })
       return await res.json()
     },
     select: todos => {
@@ -64,16 +57,15 @@ export function useCreateTodo() {
   return useMutation({
     mutationFn: async (title: string) => {
       await new Promise(resolve => setTimeout(resolve, 3000))
-      const res = await fetch(
-        'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
-        {
+      const res = await fetch('/api/todos', {
+        method: 'POST',
+        body: JSON.stringify({
           method: 'POST',
-          headers,
-          body: JSON.stringify({
+          body: {
             title: title
-          })
-        }
-      )
+          }
+        })
+      })
       return await res.json()
     },
     onMutate: title => {
@@ -110,17 +102,17 @@ export function useUpdateTodo() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (todo: Todo) => {
-      const res = await fetch(
-        `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${todo.id}`,
-        {
+      const res = await fetch(`/api/todos`, {
+        method: 'POST',
+        body: JSON.stringify({
           method: 'PUT',
-          headers,
-          body: JSON.stringify({
+          endpoint: todo.id,
+          body: {
             title: todo.title,
             done: todo.done
-          })
-        }
-      )
+          }
+        })
+      })
       return await res.json()
     },
     onMutate: () => {},
@@ -137,13 +129,13 @@ export function useDeleteTodo() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (todo: Todo) => {
-      const res = await fetch(
-        `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${todo.id}`,
-        {
+      const res = await fetch(`/api/todos`, {
+        method: 'POST',
+        body: JSON.stringify({
           method: 'DELETE',
-          headers
-        }
-      )
+          endpoint: todo.id
+        })
+      })
       return await res.json()
     },
     onMutate: () => {},
@@ -162,16 +154,16 @@ export function useDeleteDoneTodos() {
   return useMutation({
     mutationFn: async () => {
       const todoIds = todos?.filter(todo => todo.done).map(todo => todo.id)
-      const res = await fetch(
-        `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/deletions`,
-        {
+      const res = await fetch(`/api/todos`, {
+        method: 'POST',
+        body: JSON.stringify({
           method: 'DELETE',
-          headers,
-          body: JSON.stringify({
-            todoIds: todoIds
-          })
-        }
-      )
+          endpoint: 'deletions',
+          body: {
+            todoIds
+          }
+        })
+      })
       return await res.json()
     },
     onSuccess: () => {
