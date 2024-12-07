@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import TodoItem from '@/components/todos/TodoItem'
 import { useFetchTodos, useCreateTodo } from '@/hooks/todos'
+import TodoFilters from '@/components/todos/TodoFilters'
+import TodoActions from '@/components/todos/TodoActions'
 
 export default function TodosPage() {
   const { data: todos } = useFetchTodos()
@@ -32,6 +34,8 @@ export default function TodosPage() {
           {isPending ? '로딩 중..' : '할 일 추가'}
         </button>
       </div>
+      <TodoFilters />
+      <TodoActions />
       <ul>
         {todos?.map(todo => {
           return (

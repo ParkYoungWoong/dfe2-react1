@@ -1,12 +1,16 @@
-import { useUpdateTodo } from '@/hooks/todos'
+import { useUpdateTodo, useDeleteTodo } from '@/hooks/todos'
 import type { Todo } from '@/hooks/todos'
 import { useState, useRef } from 'react'
 
 export default function TodoItem({ todo }: { todo: Todo }) {
-  const { mutateAsync, isPending } = useUpdateTodo()
+  const { mutateAsync: mutateAsyncForUpdate, isPending: isPendingForUpdate } =
+    useUpdateTodo()
+  const { mutateAsync: mutateAsyncForDelete, isPending: isPendingForDelete } =
+    useDeleteTodo()
 
   const [isEditMode, setIsEditMode] = useState(false)
   const [title, setTitle] = useState(todo.title)
+  const [done, setDone] = useState(todo.done)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   function handleWindowEscapeKeyDown(event: KeyboardEvent) {
@@ -25,11 +29,15 @@ export default function TodoItem({ todo }: { todo: Todo }) {
     window.removeEventListener('keydown', handleWindowEscapeKeyDown)
   }
   async function saveTodo() {
-    await mutateAsync({
+    await mutateAsyncForUpdate({
       ...todo,
       title
     })
     setIsEditMode(false)
+  }
+  async function deleteTodo() {
+    await mutateAsyncForDelete(todo)
+    // setIsEditMode(false)
   }
 
   return (
@@ -43,13 +51,23 @@ export default function TodoItem({ todo }: { todo: Todo }) {
           />
           <button onClick={cancelEditMode}>취소</button>
           <button
-            disabled={isPending}
+            disabled={isPendingForUpdate}
             onClick={saveTodo}>
-            {isPending ? '저장 중..' : '저장'}
+            {isPendingForUpdate ? '저장 중..' : '저장'}
+          </button>
+          <button
+            disabled={isPendingForDelete}
+            onClick={deleteTodo}>
+            {isPendingForDelete ? '삭제 중..' : '삭제'}
           </button>
         </>
       ) : (
         <>
+          <input
+            type="checkbox"
+            checked={done}
+            onChange={e => setDone(e.target.checked)}
+          />
           {todo.title}
           <button onClick={() => onEditMode()}>수정</button>
         </>

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { create } from 'zustand'
 
 type Todos = Todo[] // 할 일 목록
 export interface Todo {
@@ -9,8 +10,30 @@ export interface Todo {
   createdAt: string // 할 일 생성일
   updatedAt: string // 할 일 수정일
 }
+type FilterStatus = 'all' | 'done' | 'todo'
+
+export const useTodoFiltersStore = create<{
+  filterStatus: FilterStatus
+  setFilterStatus: (status: FilterStatus) => void
+}>(set => {
+  return {
+    filterStatus: 'all',
+    setFilterStatus: status => {
+      set({
+        filterStatus: status
+      })
+    }
+  }
+})
+
+const headers = {
+  'Content-Type': 'application/json',
+  apikey: 'KDT8_bcAWVpD8',
+  username: 'KDT8_ParkYoungWoong'
+}
 
 export function useFetchTodos() {
+  const filterStatus = useTodoFiltersStore(state => state.filterStatus)
   return useQuery<Todos>({
     queryKey: ['todos'],
     queryFn: async () => {
@@ -18,14 +41,20 @@ export function useFetchTodos() {
         'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
         {
           // method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: 'KDT8_bcAWVpD8',
-            username: 'KDT8_ParkYoungWoong'
-          }
+          headers
         }
       )
       return await res.json()
+    },
+    select: todos => {
+      switch (filterStatus) {
+        case 'all':
+          return todos
+        case 'todo':
+          return todos.filter(todo => !todo.done)
+        case 'done':
+          return todos.filter(todo => todo.done)
+      }
     }
   })
 }
@@ -39,11 +68,7 @@ export function useCreateTodo() {
         'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: 'KDT8_bcAWVpD8',
-            username: 'KDT8_ParkYoungWoong'
-          },
+          headers,
           body: JSON.stringify({
             title: title
           })
@@ -89,11 +114,7 @@ export function useUpdateTodo() {
         `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${todo.id}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: 'KDT8_bcAWVpD8',
-            username: 'KDT8_ParkYoungWoong'
-          },
+          headers,
           body: JSON.stringify({
             title: todo.title,
             done: todo.done
@@ -109,5 +130,54 @@ export function useUpdateTodo() {
       })
     },
     onError: () => {}
+  })
+}
+
+export function useDeleteTodo() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (todo: Todo) => {
+      const res = await fetch(
+        `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${todo.id}`,
+        {
+          method: 'DELETE',
+          headers
+        }
+      )
+      return await res.json()
+    },
+    onMutate: () => {},
+    onSuccess: () => {
+      queryClient.fetchQuery({
+        queryKey: ['todos']
+      })
+    }
+  })
+}
+
+export function useDeleteDoneTodos() {
+  const queryClient = useQueryClient()
+  const { data: todos } = useFetchTodos()
+  // const todos = queryClient.getQueryData<Todos>(['todos'])
+  return useMutation({
+    mutationFn: async () => {
+      const todoIds = todos?.filter(todo => todo.done).map(todo => todo.id)
+      const res = await fetch(
+        `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/deletions`,
+        {
+          method: 'DELETE',
+          headers,
+          body: JSON.stringify({
+            todoIds: todoIds
+          })
+        }
+      )
+      return await res.json()
+    },
+    onSuccess: () => {
+      queryClient.fetchQuery({
+        queryKey: ['todos']
+      })
+    }
   })
 }
