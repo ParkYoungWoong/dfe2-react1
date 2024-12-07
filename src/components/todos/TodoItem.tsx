@@ -1,6 +1,6 @@
 import { useUpdateTodo, useDeleteTodo } from '@/hooks/todos'
 import type { Todo } from '@/hooks/todos'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function TodoItem({ todo }: { todo: Todo }) {
   const { mutateAsync: mutateAsyncForUpdate, isPending: isPendingForUpdate } =
@@ -12,6 +12,13 @@ export default function TodoItem({ todo }: { todo: Todo }) {
   const [title, setTitle] = useState(todo.title)
   const [done, setDone] = useState(todo.done)
   const inputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    mutateAsyncForUpdate({
+      ...todo,
+      done: done
+    })
+  }, [done])
 
   function handleWindowEscapeKeyDown(event: KeyboardEvent) {
     event.key === 'Escape' && cancelEditMode()
