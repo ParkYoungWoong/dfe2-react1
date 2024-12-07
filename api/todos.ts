@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 const headers = {
   'Content-Type': 'application/json',
@@ -6,7 +7,7 @@ const headers = {
   username: process.env.USERNAME
 }
 
-export default async function (req, res) {
+export default async function (req: VercelRequest, res: VercelResponse) {
   const { method = 'GET', endpoint = '', body } = req.body
   const { data } = await axios({
     url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${endpoint}`,
