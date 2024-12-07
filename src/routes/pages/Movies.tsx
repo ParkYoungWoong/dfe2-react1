@@ -18,11 +18,7 @@ export default function Movies() {
   const setSearchText = useMovieStore(state => state.setSearchText)
 
   const queryClient = useQueryClient()
-  const {
-    data: movies,
-    isFetching,
-    isLoading
-  } = useQuery<Movie[]>({
+  const { data: movies, isFetching } = useQuery<Movie[]>({
     queryKey: ['movies', searchText],
     queryFn: async () => {
       const res = await fetch(
