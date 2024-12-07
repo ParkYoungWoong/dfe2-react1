@@ -2,8 +2,8 @@ import axios from 'axios'
 
 const headers = {
   'Content-Type': 'application/json',
-  apikey: 'KDT8_bcAWVpD8',
-  username: 'KDT8_ParkYoungWoong'
+  apikey: process.env.APIKEY,
+  username: process.env.USERNAME
 }
 
 export default async function (req, res) {
